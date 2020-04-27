@@ -1,18 +1,24 @@
-let defaultItems = `[{"name":"Sample Watch", "price":"199", "description":"blabla", "image":"https://sc02.alicdn.com/kf/HTB1gHRfg6uhSKJjSspmq6AQDpXaI/Accept-Sample-Design-Your-Own-Blank-Wrist.jpg_350x350.jpg"}, {"name":"", "price":"", "description":"", "image":""}]`;
+let defaultItems = `[{"name":"Sample Watch", "price":"199", "description":"blabla", "image":"https://sc02.alicdn.com/kf/HTB1gHRfg6uhSKJjSspmq6AQDpXaI/Accept-Sample-Design-Your-Own-Blank-Wrist.jpg_350x350.jpg"}, {"name":"PRODUCT #2", "price":"230", "description":"some watch", "image":"https://pl.shadestation.com/media/thumbs/350x350/media/product_images/Fossil-Watches-FS5439fw350fh350.jpg"}]`;
 defaultItems = JSON.parse(defaultItems);
-let items=[];
-
+let items=[];let totalPrice=0;
 let cart = [];
 
 document.getElementById("add").addEventListener("click", add);
 document.getElementsByClassName("list-products")[0].addEventListener("click", addToCart);
 document.getElementsByClassName("shopping-cart-products")[0].addEventListener("click", addMore);
 
+document.getElementById("purchase").addEventListener("click", function(){ if(totalPrice>0){alert("Purchased successfully");}else{alert("Your cart is empty");} });
+
 function firstLoad(){
 
     if(localStorage.getItem("items")!==null){
        /*  console.log(localStorage.getItem("items")); */
+       try{
         loadItems();
+       }catch{
+           localStorage.clear();
+           location.reload();
+       }
     }else{
         fetchItems();
     }
@@ -57,7 +63,7 @@ function loadItems2(){
                     <p>${items[i].name}</p>
                     <p>$${items[i].price}</p>
                     <input type="hidden" value="${items[i].description}" class="productDescription"/>
-                    <button class="details-button">Details</button>
+                    <button class="details-button" data-id="${i}">Details</button>
                     <button class="buy-button" data-id="${i}">Buy</button>
                   </div>
                   `;
@@ -117,6 +123,8 @@ function addToCart(){
             }
         }
         
+    }else if(event.target.classList.contains("details-button")){
+    modalWindow(event.target.dataset.id);
     }
 }
 
@@ -184,7 +192,16 @@ function updatecart(){
     }
 
 document.getElementById("total").innerHTML = "Total: $" + total;
+totalPrice=total;
 
+}
+
+function modalWindow(x){
+document.getElementById("modalWindow").innerHTML = `<button id="closeModalWindow">close</button>
+<h3>${items[x].name}</h3><img src="${items[x].image}"><p>${items[x].description}</p>
+`;
+document.getElementById("modalWindowContainer").classList.add("showModalWindow");
+document.getElementById("closeModalWindow").addEventListener("click", function(){ document.getElementById("modalWindowContainer").classList.remove("showModalWindow"); });
 }
 
 firstLoad();
